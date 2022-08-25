@@ -1,7 +1,6 @@
 ---
-Title: GitHub から投稿してみました
-Date: 2022-08-25T22:19:51+09:00
-URL: https://chibaqn.hatenablog.com/entry/push-to-hatenablog
-EditURL: https://blog.hatena.ne.jp/chibaqn/chibaqn.hatenablog.com/atom/entry/4207112889911915389
+Title: 下書きプレビュー欲しい
+Date: 2022-08-25T23:19:51+09:00
+URL: https://chibaqn.hatenablog.com/entry/need-preview
 Draft: true
 ---
