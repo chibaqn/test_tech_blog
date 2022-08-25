@@ -18,7 +18,9 @@ $ docker-compose run -u "$(id -u):$(id -g)" --rm blogsync pull chibaqn.hatenablo
 
 ## 記事を執筆する流れ
 
-### 1. ローカルの master ブランチを最新化する
+### 1. ローカルの master ブランチを最新の状態にする
+
+※ ローカルにリポジトリが無いときは clone する。
 
 ```
 $ git checkout master
@@ -49,11 +51,11 @@ $ docker-compose run -u "$(id -u):$(id -g)" --rm blogsync post --draft --custom-
      store entries/chibaqn.hatenablog.com/entry/how-to-push-entry-to-hatenablog.md
 ```
 
-### 4. Pull Request を作成する
+### 3. Pull Request を作成する
 
 以降、PUSH するたびに、はてなブログ側の下書き記事が更新される。
 
-### 5. 記事を執筆する
+### 4. 記事を執筆する
 
 front matter を記載する。
 
