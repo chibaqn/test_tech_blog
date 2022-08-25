@@ -2,6 +2,8 @@
 
 はてなブログに存在する記事を取得する。
 
+[https://github.com/x-motemen/blogsync#エントリーをダウンロードする](https://github.com/x-motemen/blogsync#%E3%82%A8%E3%83%B3%E3%83%88%E3%83%AA%E3%82%92%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89%E3%81%99%E3%82%8Bblogsync-pull)
+
 ※ カスタムURLを指定していても `entries/chibaqn.hatenablog.com/entry/2022/06/15/232422.md` のような日付のパスとなるので注意。
 
 ```bash
