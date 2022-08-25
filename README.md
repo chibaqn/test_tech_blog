@@ -1,89 +1,38 @@
-# push-to-hatenablog
- GitHubとはてなブログの連携用環境。GitHubに記事の編集内容をプッシュするとはてなブログの記事も更新されます。
 
-## セットアップ
-### GitHubリポジトリの追加
-はてなブログ記事の管理用にGitHubリポジトリを作成してください。
-### `blogsync.yaml`の追加
-`blogsync.example.yaml`を`blogsync.yaml`に変更して、ドメイン名やユーザ名を書き換えてください。  
-ローカル環境から記事を新規追加するために使用します。
+## 記事を執筆する流れ
 
-`blogsync.yaml`については、以下のページを参照してください。
+### 1. master ブランチを最新化する
 
-[x-motemen/blogsync #Configuration](https://github.com/x-motemen/blogsync#configuration)
-
-### Secretの追加
-GitHubリポジトリに以下の２つのSecretを追加してください。  
-GitHubアクションで記事を更新するために使用します。
-* `DOMAIN`という名前でSecretを追加してください。値にはブログのドメイン名を設定してください。
-* `BSY`という名前で以下のような値のSecretを追加してください。
-```yaml
-[ブログのドメイン]:\n
-  username: [ユーザ名]\n
-  password: [AtomPubのAPIキー]\n
-default:\n
-  local_root: entries
-```
-
-※ Secretsの追加は`GitHubリポジトリページ/Settings/Secrets`から設定できます。詳細は以下のページを参照してください。
-
-[暗号化されたシークレットの作成と保存 #暗号化されたシークレットの作成](https://help.github.com/ja/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#about-encrypted-secrets)
-
-## はてなブログからの記事取得
-既存記事をはてなブログから取得する場合は、`domain`変数を指定してから、masterブランチで以下のコマンドを実行してください。
 ```bash
-docker-compose run --rm blogsync pull ${domain}
+$ docker-compose run -u "$(id -u):$(id -g)" --rm blogsync pull chibaqn.hatenablog.com
+       GET ---> https://blog.hatena.ne.jp/chibaqn/chibaqn.hatenablog.com/atom/entry
+       200 <--- https://blog.hatena.ne.jp/chibaqn/chibaqn.hatenablog.com/atom/entry
+     fresh remote=2022-08-25 22:42:09 +0900 +0900 > local=0001-01-01 00:00:00 +0000 UTC
+     store entries/chibaqn.hatenablog.com/entry/2022/08/25/224209.md
+     fresh remote=2022-07-26 17:11:29 +0900 +0900 > local=0001-01-01 00:00:00 +0000 UTC
+     store entries/chibaqn.hatenablog.com/entry/2022/06/15/233129.md
+     fresh remote=2022-07-20 11:50:23 +0900 +0900 > local=0001-01-01 00:00:00 +0000 UTC
+     store entries/chibaqn.hatenablog.com/entry/2022/06/15/232422.md
 ```
-はてなブログの更新はmasterブランチからの差分が対象となります。
+### 2. 新しい記事を追加する
 
-記事数が多いとはてなブログの更新に時間がかかるため、masterブランチで記事を取得・コミットして、ブログの更新を回避してください。
+記事執筆用のブランチを作成する。
 
-特に初回の記事取得など記事数が多い場合はmasterブランチで取得するようにしてください。
-
-## 新しい記事の追加
-`path`と`domain`変数を設定して、以下のコマンドを実行するとはてなブログとローカルに下書きが追加されます。
 ```bash
-docker-compose run --rm blogsync post --title=draft --draft --custom-path=${path} ${domain} < draft.md
+$ git checkout -b how-to-push-entry-to-hatenablog
 ```
 
-## 編集した記事の更新
-編集した記事ファイルをGitHubへプッシュすると、GitHubアクションによってmasterブランチからの差分がはてなブログでも更新されます。
+記事の雛形を生成する。
 
-GitHubアクションの設定は以下を確認してください。
+| オプション | 説明 |
+| --- | --- |
+| --draft | 下書きモードで作成する |
+| --title | ブログのタイトル |
+| --custom-path | 記事の URL のパス |
 
-[.github/workflows/push.yml](.github/workflows/push.yml)
-
-※ masterブランチからの差分が更新対象となるため、masterブランチで記事ファイルを編集しても記事の更新は実行されません。master以外のブランチで編集してください。
-
-## Slack通知設定
-### `.github/workflows/push.yml`の調整
-Slackに更新ワークフローの結果を通知する場合は、[.github/workflows/push.yml](.github/workflows/push.yml)内の以下のコメントアウトを解除してください。
-```yaml
-# - name: notify to slack
-#   uses: mm0202/action_slack-notify@master
-#   if: always()
-#   env:
-#     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+```bash
+$ docker-compose run --rm blogsync post --draft --title=はてなブログに記事をPUSHする方法 --custom-path=how-to-push-entry-to-hatenablog chibaqn.hatenablog.com < draft.md
+      POST ---> https://blog.hatena.ne.jp/chibaqn/chibaqn.hatenablog.com/atom/entry
+       201 <--- https://blog.hatena.ne.jp/chibaqn/chibaqn.hatenablog.com/atom/entry
+     store entries/chibaqn.hatenablog.com/entry/how-to-push-entry-to-hatenablog.md
 ```
-
-### Secretの追加
-`GitHubリポジトリページ/Settings/Secrets`から以下のSecretを追加してください。
-| key | value
-| - | - 
-| SLACK_WEBHOOK_URL | Incoming Webhookで指定されたWebhook URL
-
-## `scripts`ディレクトリについて
-`scripts`ディレクトリに記事の取得、投稿スクリプトを設置しています。
-
-`scripts`内のスクリプトを使用する場合は、`.env`ファイルを作成して`DOMAIN=[ブログのドメイン]`を追加してください。
-
-### 記事の取得
-ルートディレクトリで`scripts/pull.sh`を実行してください。
-
-`npm`(または`yarn`)環境がある場合は、`npm run pull`(または`yarn run pull`)でも記事を取得できます。
-
-### 記事の投稿
-`scripts/pull.sh`の`custom_path=[custom_path]`の部分に投稿する記事のカスタムパスを設定して、ルートディレクトリで`scripts/pull.sh`を実行してください。
-
-`npm`(または`yarn`)環境がある場合は、`npm run push`(または`yarn run push`)でも記事を取得できます。
-
