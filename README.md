@@ -31,7 +31,7 @@ $ git checkout -b how-to-push-entry-to-hatenablog
 | --custom-path | 記事の URL のパス |
 
 ```bash
-$ docker-compose run --rm blogsync post --draft --title=はてなブログに記事をPUSHする方法 --custom-path=how-to-push-entry-to-hatenablog chibaqn.hatenablog.com < draft.md
+$ docker-compose run -u "$(id -u):$(id -g)" --rm blogsync post --draft --title=はてなブログに記事をPUSHする方法 --custom-path=how-to-push-entry-to-hatenablog chibaqn.hatenablog.com < draft.md
       POST ---> https://blog.hatena.ne.jp/chibaqn/chibaqn.hatenablog.com/atom/entry
        201 <--- https://blog.hatena.ne.jp/chibaqn/chibaqn.hatenablog.com/atom/entry
      store entries/chibaqn.hatenablog.com/entry/how-to-push-entry-to-hatenablog.md
