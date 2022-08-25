@@ -10,3 +10,5 @@ CustomPath: hogehoge-how-to-push-entry-to-hatenablog
 ## はじめに
 
 途中で `CustomPath` を変えることは可能ですか？？
+
+-> 可能でした！
